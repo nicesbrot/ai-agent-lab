@@ -1,6 +1,14 @@
 @AgentLab.Api_HostAddress = http://localhost:5030
 
-GET {{AgentLab.Api_HostAddress}}/weatherforecast/
+POST {{AgentLab.Api_HostAddress}}/api/chat
 Accept: application/json
+Content-Type: application/json
 
-###
+{
+  "messages": [
+    {
+      "role": "user",
+      "content": "Can you explain what the AI Agent Lab project is about?"
+    }
+  ]
+}

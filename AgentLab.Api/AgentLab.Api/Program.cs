@@ -1,23 +1,59 @@
+﻿using System.ClientModel;
+using AgentLab.Api;
+using AgentLab.Api.Contracts;
+using DotNetEnv;
+using OpenAI.Chat;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+//load configuration from .env file
+var secrets = Env.Load().ToDictionary();
+
+string apiKey = secrets["OPENAI__APIKEY"];
+
+builder.Services.AddSingleton(new ChatClient("gpt-4.1-nano", apiKey));
 
 builder.Services.AddControllers();
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.MapOpenApi();
-}
-
 app.UseHttpsRedirection();
+app.MapPost("/api/chat", async (ChatRequest request, ChatClient chatClient) =>
+{
+    if (request.Messages is null || request.Messages.Count == 0)
+    {
+        return Results.BadRequest(new { error = "messages[] is required" });
+    }
 
-app.UseAuthorization();
+    var chatMessages = new List<ChatMessage>()
+    {
+        new SystemChatMessage(AgentLabSystemChatMessage.Message)
+    };
 
-app.MapControllers();
+    foreach (ChatMessageDto msg in request.Messages)
+    {
+        string role = msg.Role.Trim().ToLowerInvariant();
+
+        //FAQ: ❓ What is the difference between the system, user, and assistant roles?
+        ChatMessage chatMessage = role switch
+        {
+            "system" => new SystemChatMessage(msg.Content),
+            "assistant" => new AssistantChatMessage(msg.Content),
+            _ => new UserChatMessage(msg.Content) // default: user
+        };
+
+        chatMessages.Add(chatMessage);
+    }
+
+    // Call OpenAI via ChatClient
+    ClientResult<ChatCompletion> completion = await chatClient.CompleteChatAsync(chatMessages);
+
+    string content = completion.Value.Content.FirstOrDefault()?.Text ?? string.Empty;
+
+    ChatResponseDto response = new ChatResponseDto("assistant", content);
+
+    return Results.Ok(response);
+})
+    .WithName("Chat");
 
 app.Run();
