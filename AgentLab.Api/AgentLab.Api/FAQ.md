@@ -44,9 +44,12 @@ A foundation you can later replace with your own hosted model.
 
 Answer:
 Go to https://platform.openai.com/account/billing/overview
-.
 From there, choose Payment Methods and add a credit or debit card.
 Then visit Usage Limits to set a spending cap (e.g. $5 per month) for safe testing.
+
+❓ Where do I store my OpenAI API key in this project?
+Answer:
+You should store your OpenAI API key in a .env file in the projects root folder. The parameter should be named OPENAI__APIKEY.
 
 ❓ How does the FAQ response system work in AI Agent Lab?
 

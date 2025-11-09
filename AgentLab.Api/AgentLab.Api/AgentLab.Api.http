@@ -8,7 +8,7 @@ Content-Type: application/json
   "messages": [
     {
       "role": "user",
-      "content": "Can you explain what the AI Agent Lab project is about?"
+      "content": "Where do I store my OpenAI API key?"
     }
   ]
 }
