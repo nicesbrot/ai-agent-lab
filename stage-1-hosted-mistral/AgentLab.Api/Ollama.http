@@ -1,0 +1,49 @@
+﻿@baseUrl = http://localhost:11434
+
+### 🧠 Simple Chat Request
+POST {{baseUrl}}/api/chat
+Accept: application/json
+Content-Type: application/json
+
+{
+  "model": "mistral",
+  "messages": [
+    { "role": "system", "content": "You are a helpful AI assistant." },
+    { "role": "user", "content": "What is Stage 1 in the AI Agent Lab project?" }
+  ],
+  "stream": false,
+    "options": {
+    "num_predict": 128  
+  }
+}
+
+###
+
+### 🧩 Streaming Example (Antwort kommt tokenweise)
+POST {{baseUrl}}/api/chat
+Accept: text/event-stream
+Content-Type: application/json
+
+{
+  "model": "mistral",
+  "messages": [
+    { "role": "user", "content": "Tell me a fun fact about space." }
+  ],
+  "stream": true
+}
+
+###
+
+### 🧾 Check running models
+GET {{baseUrl}}/api/tags
+Accept: application/json
+
+###
+
+### 🧰 Pull a model if not yet downloaded
+POST {{baseUrl}}/api/pull
+Content-Type: application/json
+
+{
+  "name": "mistral"
+}

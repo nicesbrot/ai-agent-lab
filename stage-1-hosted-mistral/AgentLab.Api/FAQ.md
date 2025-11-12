@@ -1,8 +1,4 @@
-﻿Sehr gute Idee 💡 – das macht dein Projekt sauber dokumentiert und hilft später beim Verständnis der Stufen.
-Hier ist ein kompletter FAQ-Abschnitt zu Stage 1 („Hosted Model“) für dein FAQ.md, im gleichen Stil wie deine bisherigen Einträge:
-
-🧩 Stage 1 – Hosted Model (FAQ)
-❓ What is Stage 1 – Hosted Model about?
+﻿❓ What is Stage 1 – Hosted Model about?
 
 Answer:
 Stage 1 demonstrates how to replace the external OpenAI API with your own locally or cloud-hosted LLM.
@@ -10,9 +6,6 @@ Instead of sending requests to api.openai.com, your backend communicates with a 
 This removes external dependencies and makes your system fully controllable.
 
 ❓ What is the difference between Ollama, vLLM, and TGI?
-
-Answer:
-
 Feature	Ollama 🧑‍💻	vLLM ⚙️	TGI 🧠
 Target users	Developers who want easy local testing	Research / Production servers	Enterprise / Hugging Face ecosystem
 Installation	1-Click (Windows / macOS / Linux)	Python + GPU setup / Docker	Docker image from Hugging Face
@@ -30,38 +23,46 @@ Later you can switch to vLLM or TGI on a GPU server for better performance or pr
 Answer:
 Create a common interface such as ILlmClient in your C# backend.
 Then add one implementation per engine:
-OllamaLlmClient, VllmLlmClient, and TgiLlmClient.
-Select which one to use through an environment variable, e.g.:
+
+OllamaLlmClient
+
+VllmLlmClient
+
+TgiLlmClient
+
+Select which one to use through an environment variable:
 
 LLM_PROVIDER=ollama
 LLM_API_BASEURL=http://localhost:11434
 
 
-The API endpoint /api/chat remains unchanged — only the implementation behind the interface switches.
+Your endpoint /api/chat stays identical — only the implementation behind the interface changes.
 
 ❓ Can I test Stage 1 without a GPU or server?
 
 Answer:
 Yes ✅ — Ollama works perfectly on CPU, just slower.
-You can run the full Stage 1 locally, test requests, and document everything.
-For vLLM or TGI, you can temporarily rent an inexpensive GPU cloud instance (e.g. RunPod / Vast / Lambda) for a few dollars per hour .
+You can run the full Stage 1 locally and test your entire pipeline.
+For vLLM or TGI, rent a temporary GPU instance (RunPod, Vast, Lambda) for a few USD/hour.
 
 ❓ How do I install Ollama?
 
 Answer:
+
 Go to https://ollama.com/download
-, install it for your OS, then run:
+
+Install for your OS
+
+Run:
 
 ollama pull mistral
 ollama run mistral
 
 
-Ollama starts a local REST API at http://localhost:11434.
+Ollama starts a REST API at http://localhost:11434
+.
 
 ❓ What does the data flow look like in Stage 1?
-
-Answer:
-
 --------------                 -----------------                 -----------------
 |  UserPrompt |  ───────────▶  |  REST API (C#) |  ───────────▶  |  Ollama/vLLM/TGI |
 --------------                 -----------------                 -----------------
@@ -70,30 +71,51 @@ Answer:
                                 Project responsibility
 
 
-The project owns the REST API → inference request logic.
-
-The inference engine (Ollama/vLLM/TGI) handles the actual model execution.
-
+The project owns the REST API and request logic.
+The inference engine handles model execution.
 OpenAI is no longer involved.
 
 ❓ How does Stage 1 differ from Stage 0?
+Stage	Description
+Stage 0	Calls the OpenAI API directly.
+Stage 1	Hosts the model yourself (Ollama / vLLM / TGI).
 
-Answer:
-
-Stage 0 calls the OpenAI API directly.
-
-Stage 1 hosts the model itself locally or on your own server.
-
-You gain independence, lower costs, and the ability to fine-tune or swap models.
+Benefits: independence, privacy, and lower cost.
 
 ❓ What are the main benefits of Stage 1?
 
-Answer:
-
 ✅ No external API costs or rate limits
-
 ⚙️ Full control over model choice and hosting
-
 🧠 Foundation for future fine-tuning (Stage 2)
-
 🔒 Data stays private within your infrastructure
+
+❓ What are the available options for customizing responses in Ollama API requests?
+
+You can pass generation options in the request body under "options": { … }.
+
+Option	Type	Typical Range	Description
+temperature	float	0.0 – 1.5	Controls randomness. Low = deterministic (precise); high = creative.
+top_p	float	0.5 – 1.0	Limits sampling to the top p cumulative probability mass (nucleus sampling).
+num_predict	int	32 – 512	Maximum number of tokens the model may generate. Reducing it prevents long responses/timeouts.
+repeat_penalty	float	1.0 – 2.0	Penalizes repetition of identical phrases; higher = fewer repeats.
+seed	int	e.g. 42	Fixes the random seed for reproducible output.
+stop	string / array	e.g. ["User:", "System:"]	Defines stop sequences to end generation early.
+presence_penalty	float	0 – 2	Discourages reusing topics already mentioned.
+frequency_penalty	float	0 – 2	Penalizes frequently used tokens.
+mirostat	int	0, 1, 2	Enables dynamic temperature control for stable entropy (advanced).
+
+Example usage:
+
+{
+  "model": "mistral",
+  "messages": [
+    { "role": "user", "content": "Explain photosynthesis briefly." }
+  ],
+  "stream": false,
+  "options": {
+    "temperature": 0.7,
+    "top_p": 0.9,
+    "num_predict": 128,
+    "repeat_penalty": 1.1
+  }
+}
