@@ -1,0 +1,72 @@
+﻿### Chat Agent – simple user question
+POST http://localhost:5030/api/chat-agent
+Content-Type: application/json
+
+{
+  "messages": [
+    {
+      "role": "user",
+      "content": "What is the AI Agent Lab?"
+    }
+  ]
+}
+
+###
+
+### Chat Agent – question that should trigger FAQ lookup
+POST http://localhost:5030/api/chat-agent
+Content-Type: application/json
+
+{
+  "messages": [
+    {
+      "role": "user",
+      "content": "How does the FAQ mechanism work?"
+    }
+  ]
+}
+
+###
+
+###❓ Why didn't the agent call the FAQ during my follow-up question?
+### Chat Agent – multi-turn conversation (follow-up question)
+POST http://localhost:5030/api/chat-agent
+Content-Type: application/json
+
+{
+  "messages": [
+    { "role": "user", "content": "What happens in Stage 1?" },
+    { "role": "assistant", "content": "Stage 1 runs a self-hosted model." },
+    { "role": "user", "content": "And how is that different from Stage 0?" }
+  ]
+}
+
+### Chat Agent – question that should lead to reading FAQ.md
+POST http://localhost:5030/api/chat-agent
+Content-Type: application/json
+
+{
+  "messages": [
+    {
+      "role": "user",
+      "content": "What does the FAQ say about architecture?"
+    }
+  ]
+}
+
+###
+
+### Chat Agent – forced file read test
+POST http://localhost:5030/api/chat-agent
+Content-Type: application/json
+
+{
+  "messages": [
+    {
+      "role": "user",
+      "content": "Can you open FAQ.md and check if 'Stage 2' is mentioned?"
+    }
+  ]
+}
+
+###

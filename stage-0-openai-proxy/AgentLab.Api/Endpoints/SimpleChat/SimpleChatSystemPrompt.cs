@@ -1,6 +1,6 @@
-﻿namespace AgentLab.Api
+﻿namespace AgentLab.Api.Endpoints.SimpleChat
 {
-    public static class AgentLabSystemChatMessage
+    public static class SimpleChatSystemPrompt
     {
         //FAQ:❓ How does the FAQ response system work in AI Agent Lab?
         public static readonly string Message = $@"
