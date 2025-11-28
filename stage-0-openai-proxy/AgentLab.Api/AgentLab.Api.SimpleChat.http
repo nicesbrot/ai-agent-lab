@@ -1,6 +1,6 @@
 @AgentLab.Api_HostAddress = http://localhost:5030
 
-POST {{AgentLab.Api_HostAddress}}/api/chat
+POST {{AgentLab.Api_HostAddress}}/api/simple-chat
 Accept: application/json
 Content-Type: application/json
 
